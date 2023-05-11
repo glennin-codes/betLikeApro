@@ -2,10 +2,11 @@ import axios from "axios";
 
 export const test=async ()=>{
 try{
-   const response =await  axios.get('http://api.football-data.org/v4/matches?status=SCHEDULED', {
-        headers: { 'X-Auth-Token': '5777078bb3ca4a72a3e01a5fdebac8db' }
-      })
-       console.log("testing data",response);
+  const API_URL = 'http://localhost:8080/matches'
+   const data = await  axios.get(API_URL);
+   const {matches}=data.data
+       console.log("testing data",matches);
+       
     
 }catch(error){
     console.log(error)
