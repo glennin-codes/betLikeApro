@@ -42,7 +42,7 @@ function Home() {
   const [matches, setMatches] = useState([]);
   const [today, setToday] = useState("");
   const [tomorrow, setTomorrow] = useState("");
-
+  const [error, setError] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null);
   const [showPredictionToast, setShowPredictionToast] = useState(false);
 
