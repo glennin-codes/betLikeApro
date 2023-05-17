@@ -38,9 +38,13 @@ function Home() {
     setTomorrow(formatDate(tomorrow));
 
     axios.get('http://localhost:5000/matches').then((response) => {
-      const { data } = response;
+      console.log("original",response);
+   
+    const { data } = response;
+       console.log("original",data);
+      
       setMatches(
-        data.matches.filter((match) => {
+        data.filter((match) => {
           const matchDate = new Date(match.matchTime);
           return matchDate >= today && matchDate < tomorrow;
         })
@@ -48,10 +52,10 @@ function Home() {
     });
   }, []);
 
-  const handlePrediction = ({match}) => {
-    const {homeTeamName,awayTeamName}=match;
+  const handlePrediction = ({homeTeamID,awayTeamId}) => {
+    
 
-    axios.post('http://localhost:5000/predict', {homeTeamName,awayTeamName}).then((response) => {
+    axios.post('http://localhost:5000/predict', {homeTeamID,awayTeamId}).then((response) => {
       console.log(response.data.prediction);
     });
   };
