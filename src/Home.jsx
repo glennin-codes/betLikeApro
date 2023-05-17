@@ -9,6 +9,7 @@ import {
   Typography,
   Divider,
   Snackbar,
+  CircularProgress,
 } from "@mui/material";
 import { Skeleton } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
@@ -42,6 +43,7 @@ function Home() {
   const [matches, setMatches] = useState([]);
   const [today, setToday] = useState("");
   const [tomorrow, setTomorrow] = useState("");
+  const [Loading, setLoading] = useState(false);
   const [matchLoading, setMatchLoading] = useState(false);
   const [error, setError] = useState(null);
   const [predictionResult, setPredictionResult] = useState(null);
@@ -77,12 +79,14 @@ function Home() {
 
   const handlePrediction = (match) => {
     const { homeTeamId, awayTeamId, homeTeamName, awayTeamName } = match;
+    setLoading(true);
     axios
       .post("http://localhost:5000/predict", {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
       })
       .then((response) => {
+        setLoading(false);
         const prediction = response.data.prediction;
         if (prediction === 0) {
           setPredictionResult(`${homeTeamName} has a high chances of winning`);
@@ -98,6 +102,7 @@ function Home() {
         setShowPredictionToast(true);
       })
       .catch((error) => {
+        setLoading(false)
         if (error.response && error.response.status === 500) {
           setError("Server error. Please try again later.");
         } else {
@@ -201,7 +206,83 @@ function Home() {
                 </Grid>
               </CardContent>
             </StyledCard>
-            <StyledCard sx={{ height: 150, width: 300 }}>
+            <StyledCard sx={{ height: 150, width: 300,marginBottom:'5rem' }}>
+              <CardContent sx={{ fontSize: "3rem" }}>
+                {/* Skeleton for the logo */}
+
+                <Grid
+                  item
+                  xs={12}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Skeleton
+                    variant="rectangular"
+                    width={50}
+                    height={50}
+                    style={{ borderRadius: "50%" }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width={50}
+                    height={50}
+                    style={{ borderRadius: "50%" }}
+                  />
+                </Grid>
+                <Grid item
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {/* Skeleton for the team names */}
+                  <Skeleton
+                    variant="text"
+                    width={260}
+                    height={24}
+                    
+                    style={{ marginTop: "8px" ,paddingRight:'10'}}
+                  />
+
+                  {/* Skeleton for the competition name */}
+                  <Skeleton
+                    variant="text"
+                    width={260}
+                    height={24}
+                    style={{ marginTop: "8px" }}
+                  />
+                </Grid>
+                <Grid item
+                xs={12}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                
+                }}
+                >
+                {/* Skeleton for the match time */}
+                <Skeleton
+                  variant="text"
+                  width={280}
+                  height={12}
+                  style={{ marginTop: "4px" }}
+                />
+
+                {/* Skeleton for the Predict button */}
+                <Skeleton
+                  variant="rectangular"
+                  width={280}
+                  height={36}
+                  style={{ marginTop: "8px" }}
+                />
+                </Grid>
+              </CardContent>
+            </StyledCard>
+            <StyledCard sx={{ height: 150, width: 300,marginBottom:'5rem' }}>
               <CardContent sx={{ fontSize: "3rem" }}>
                 {/* Skeleton for the logo */}
 
@@ -286,7 +367,6 @@ function Home() {
               <Grid item key={match.matchId}>
                 <StyledCard>
                   <CardContent
-                    sx={{ display: "flex", flexDirection: "column" }}
                   >
                     <Grid container alignItems="center" spacing={2}>
                       <Grid item>
@@ -294,7 +374,7 @@ function Home() {
                           src={match.homeTeamLogo}
                           alt={match.homeTeamName}
                         />
-                      </Grid>
+                      </Grid> 
                       <Grid item>
                         <Typography variant="h6" component="h2">
                           {match.homeTeamName} vs {match.awayTeamName}
@@ -319,7 +399,8 @@ function Home() {
                       color="primary"
                       onClick={() => handlePrediction(match)}
                     >
-                      Predict
+                      {Loading ? <CircularProgress size={24} /> :    Predict  }
+                  
                     </Button>
                   </CardContent>
                 </StyledCard>
