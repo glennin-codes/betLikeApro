@@ -105,9 +105,7 @@ function Home() {
       });
   };
 
-  const handlePredictionToastClose = () => {
-    setShowPredictionToast(false);
-  };
+
   const handleClosePredictionToast = () => {
     setShowPredictionToast(false);
     setPredictionResult("");
