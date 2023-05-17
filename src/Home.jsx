@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
-import axios from 'axios';
-import { Button, Card, CardContent, Grid, Typography, Divider, Snackbar } from '@mui/material';
-import { test } from './test';
+import React, { useState, useEffect } from "react";
+import styled from "@emotion/styled";
+import axios from "axios";
+import {
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Divider,
+  Snackbar,
+} from "@mui/material";
+import MuiAlert from '@mui/material/Alert';
+
 
 const Root = styled.div`
   padding: ${({ theme }) => theme.spacing(2)};
@@ -20,15 +29,20 @@ const LogoImage = styled.img`
 `;
 
 function formatDate(date) {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
   return date.toLocaleDateString(undefined, options);
 }
 
 function Home() {
   const [matches, setMatches] = useState([]);
-  const [today, setToday] = useState('');
-  const [tomorrow, setTomorrow] = useState('');
- 
+  const [today, setToday] = useState("");
+  const [tomorrow, setTomorrow] = useState("");
+
   const [predictionResult, setPredictionResult] = useState(null);
   const [showPredictionToast, setShowPredictionToast] = useState(false);
 
@@ -39,38 +53,64 @@ function Home() {
     setToday(formatDate(today));
     setTomorrow(formatDate(tomorrow));
 
-    axios.get('http://localhost:5000/matches').then((response) => {
-      const { data } = response;
-      setMatches(
-        data.filter((match) => {
-          const matchDate = new Date(match.matchTime);
-          return matchDate >= today && matchDate < tomorrow;
-        })
-      );
-    });
+    axios
+      .get("http://localhost:5000/matches")
+      .then((response) => {
+        const { data } = response;
+        setMatches(
+          data.filter((match) => {
+            const matchDate = new Date(match.matchTime);
+            return matchDate >= today && matchDate < tomorrow;
+          })
+        );
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError("Network error. Please check your internet connection.");
+        }
+        setIsLoading(false);
+      });
   }, []);
 
   const handlePrediction = (match) => {
-    const { homeTeamId, awayTeamId,homeTeamName,awayTeamName } = match;
-    axios.post('http://localhost:5000/predict', { home_team_id: homeTeamId, away_team_id: awayTeamId }).then((response) => {
-      const prediction = response.data.prediction;
-      if (prediction===0){
-            
-      setPredictionResult(`${homeTeamName} has a high chances of winning`);
-      }
-      else if(prediction===1){
-        setPredictionResult(`${awayTeamName} high chances of winning`)
-      }else if(prediction===0){
-        setPredictionResult('mostly going to a Draw')
-      }else{
-        setPredictionResult('undocumented,I may miss some old data')
-      }
-      setShowPredictionToast(true);
-    });
+    const { homeTeamId, awayTeamId, homeTeamName, awayTeamName } = match;
+    axios
+      .post("http://localhost:5000/predict", {
+        home_team_id: homeTeamId,
+        away_team_id: awayTeamId,
+      })
+      .then((response) => {
+        const prediction = response.data.prediction;
+        if (prediction === 0) {
+          setPredictionResult(`${homeTeamName} has a high chances of winning`);
+        } else if (prediction === 1) {
+          setPredictionResult(`${awayTeamName} high chances of winning`);
+        } else if (prediction === 0) {
+          setPredictionResult("mostly going to a Draw");
+        } else {
+          setPredictionResult(
+            "Undocumented prediction. Please check again later."
+          );
+        }
+        setShowPredictionToast(true);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError("Network error. Please check your internet connection.");
+        }
+      });
   };
 
   const handlePredictionToastClose = () => {
     setShowPredictionToast(false);
+  };
+  const handleClosePredictionToast = () => {
+    setShowPredictionToast(false);
+    setPredictionResult("");
   };
 
   return (
@@ -89,7 +129,10 @@ function Home() {
               <CardContent>
                 <Grid container alignItems="center" spacing={2}>
                   <Grid item>
-                    <LogoImage src={match.homeTeamLogo} alt={match.homeTeamName} />
+                    <LogoImage
+                      src={match.homeTeamLogo}
+                      alt={match.homeTeamName}
+                    />
                   </Grid>
                   <Grid item>
                     <Typography variant="h6" component="h2">
@@ -97,7 +140,10 @@ function Home() {
                     </Typography>
                   </Grid>
                   <Grid item>
-                    <LogoImage src={match.awayTeamLogo} alt={match.awayTeamName} />
+                    <LogoImage
+                      src={match.awayTeamLogo}
+                      alt={match.awayTeamName}
+                    />
                   </Grid>
                 </Grid>
                 <Typography color="textSecondary" gutterBottom>
@@ -123,10 +169,18 @@ function Home() {
       </Typography>
       <Snackbar
         open={showPredictionToast}
-        autoHideDuration={3000}
-        onClose={handlePredictionToastClose}
-        message={`Prediction: ${predictionResult}`}
-      />
+        autoHideDuration={3500}
+        onClose={handleClosePredictionToast}
+      >
+        <MuiAlert
+          severity={error ? "error" : "success"}
+          onClose={handleClosePredictionToast}
+          elevation={6}
+          variant="filled"
+        >
+          {error ? error : predictionResult}
+        </MuiAlert>
+      </Snackbar>
     </Root>
   );
 }
