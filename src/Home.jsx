@@ -57,17 +57,22 @@ function Home() {
     setTomorrow(formatDate(tomorrow));
     setMatchLoading(true);
     axios
-      .get("https://propredictor.azurewebsites.net/matches")
-      .then((response) => {
-        const { data } = response;
-        setMatchLoading(false);
+    .get("https://propredictor.azurewebsites.net/matches")
+    .then((response) => {
+      const { data } = response;
+      setMatchLoading(false);
+  
+      if (data && data.length > 0) {
         setMatches(
           data.filter((match) => {
             const matchDate = new Date(match.matchTime);
             return matchDate >= today && matchDate < tomorrow;
           })
         );
-      })
+      } else {
+        setMatches([]); // Set an empty array to indicate no matches
+      }
+    })
       .catch((error) => {
         if (error.response && error.response.status === 500) {
           setError("Server error. Please try again later.");
@@ -366,7 +371,8 @@ function Home() {
       ) : (
         <>
           <Grid container spacing={2} justify="center">
-            {matches.map((match) => (
+            { matches.length > 0 ? (
+            matches.map((match) => (
               <Grid item key={match.matchId}>
                 <StyledCard>
                   <CardContent
@@ -408,10 +414,28 @@ function Home() {
                   </CardContent>
                 </StyledCard>
               </Grid>
-            ))}
+            ))): (
+              <Grid item xs={12} sx={{ textAlign: 'center', padding: '2rem' }}>
+                <Typography variant="h5" color="textSecondary" gutterBottom>
+                  No matches today
+                </Typography>
+                <Typography variant="body1">
+                  Check back later for more exciting matches!
+                </Typography>
+                <img
+                  src="https://scontent.fnbo9-1.fna.fbcdn.net/v/t39.30808-6/331269067_562886035783249_661952417681640681_n.png?_nc_cat=103&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeFU6KtPG2no_02pnBx1ENn2azI1BOuOzT5rMjUE647NPtafPqTThSi6zczO5neF8FHt-8YARaKjC6ELxSbdmpMW&_nc_ohc=j8eSD-aLjMYAX-T849K&_nc_pt=5&_nc_zt=23&_nc_ht=scontent.fnbo9-1.fna&oh=00_AfBmz8z2mIZDoihapEOtQotMh814pmg_A_diRZP9H5INHg&oe=646B4ED1"
+                  alt="No Matches"
+                  style={{ marginTop: '2rem', width: '600px', height: '200px',objectFit:'contain' }}
+                />
+              </Grid>
+            )}
+          
+            
+
           </Grid>
         </>
-      )}
+      )} 
+      
       <>
         <Typography variant="h6" align="center" gutterBottom>
           {tomorrow}
