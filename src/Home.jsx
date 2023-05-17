@@ -416,7 +416,7 @@ function Home() {
               </Grid>
             ))): (
               <Grid item xs={12} sx={{ textAlign: 'center', padding: '2rem' }}>
-                <Typography variant="h5" color="textSecondary" gutterBottom>
+                <Typography variant="h5" color="error" gutterBottom>
                   No matches today
                 </Typography>
                 <Typography variant="body1">
