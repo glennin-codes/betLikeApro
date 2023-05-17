@@ -57,7 +57,7 @@ function Home() {
     setTomorrow(formatDate(tomorrow));
     setMatchLoading(true);
     axios
-      .get("http://localhost:5000/matches")
+      .get("https://propredictor.azurewebsites.net/matches")
       .then((response) => {
         const { data } = response;
         setMatchLoading(false);
@@ -81,7 +81,7 @@ function Home() {
     const { homeTeamId, awayTeamId, homeTeamName, awayTeamName } = match;
     setLoading(true);
     axios
-      .post("http://localhost:5000/predict", {
+      .post("https://propredictor.azurewebsites.net/predict", {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
       })
