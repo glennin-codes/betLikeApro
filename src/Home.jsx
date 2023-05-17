@@ -51,7 +51,7 @@ function Home() {
   }, []);
 
   const handlePrediction = (match) => {
-    const { homeTeamId, awayTeamId } = match;
+    const { homeTeamId, awayTeamId,homeTeamName,awayTeamName } = match;
     axios.post('http://localhost:5000/predict', { home_team_id: homeTeamId, away_team_id: awayTeamId }).then((response) => {
       const prediction = response.data.prediction;
       if (prediction===0){
