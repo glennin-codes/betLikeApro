@@ -385,7 +385,7 @@ function Home() {
                         />
                       </Grid> 
                       <Grid item>
-                        <Typography variant="h6" component="h2">
+                        <Typography variant="h6" component="h3">
                           {match.homeTeamName} vs {match.awayTeamName}
                         </Typography>
                       </Grid>
@@ -403,12 +403,15 @@ function Home() {
                       {new Date(match.matchTime).toLocaleString()}
                     </Typography>
                     <Button
+                    style={{fontFamily:'ubuntu'}}
                       sx={{ bottom: -10, width: "100%", textAlign: "center" }}
                       variant="contained"
                       color="primary"
                       onClick={() => handlePrediction(match)}
                     >
-                      {Loading ? <CircularProgress size={24} /> :    Predict  }
+                      {Loading ? <CircularProgress size={24} 
+                      style={{color:'magenta',fontWeight:700}}
+                      /> : "Predict" }
                   
                     </Button>
                   </CardContent>
